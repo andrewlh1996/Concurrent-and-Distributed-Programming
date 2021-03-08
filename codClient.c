@@ -38,6 +38,7 @@ int main(){
 		printf("Client: \t");
 		scanf("%s", &buffer[0]);
 		send(clientSocket, buffer, strlen(buffer), 0);
+		bzero(buffer, sizeof(buffer));
 
 		if(strcmp(buffer, ":exit") == 0){
 			close(clientSocket);

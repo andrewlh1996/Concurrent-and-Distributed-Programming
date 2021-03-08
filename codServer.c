@@ -9,10 +9,25 @@
 
 #define PORT 4444
 
+char *strrevv(char *str)
+{
+      char *p1, *p2;
+
+      if (! str || ! *str)
+            return str;
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+      {
+            *p1 ^= *p2;
+            *p2 ^= *p1;
+            *p1 ^= *p2;
+      }
+      return str;
+}
+
 int main(){
 
 	int sockfd, ret;
-	 struct sockaddr_in serverAddr;
+	struct sockaddr_in serverAddr;
 
 	int newSocket;
 	struct sockaddr_in newAddr;
@@ -59,14 +74,30 @@ int main(){
 			close(sockfd);
 
 			while(1){
+				bzero(buffer, sizeof(buffer));
 				recv(newSocket, buffer, 1024, 0);
 				if(strcmp(buffer, ":exit") == 0){
 					printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
 					break;
 				}else{
+					if(strcmp(buffer, ":hello") == 0){
 					printf("Client: %s\n", buffer);
-					send(newSocket, buffer, strlen(buffer), 0);
-					bzero(buffer, sizeof(buffer));
+					char message[] = "Greetings to you as well, my little friend!";
+					send(newSocket, message, strlen(message), 0);
+					bzero(message, sizeof(message));
+					}else{
+						if(strncmp(buffer, ":i", 2) == 0){
+							printf("Client: %s\n", buffer);
+							//printf("Client: %s\n", strrevv(buffer));
+							char *message = strrevv(buffer);
+							send(newSocket, message, strlen(message), 0);
+							bzero(message, sizeof(message));
+						}else{
+							printf("Client: %s\n", buffer);
+							send(newSocket, buffer, strlen(buffer), 0);
+							bzero(buffer, sizeof(buffer));
+						}
+					}
 				}
 			}
 		}
@@ -78,3 +109,4 @@ int main(){
 
 	return 0;
 }
+
