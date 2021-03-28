@@ -49,11 +49,30 @@ function deleteStudent(id) {
 
     fs.writeFile('./students.json', jsonString, err => {
         if (err) {
-            console.log('Error writing file', err)
+            console.log('Error writing file', err);
+            return false;
+            
         } else {
-            console.log('Successfully wrote file')
+            console.log('Successfully wrote file');
         }
     })
+    return true;
+}
+
+function addStudent(student) { 
+    let students = JSON.parse(fs.readFileSync('./students.json'));
+    students.push(student);
+    let jsonString = JSON.stringify(students);
+
+    fs.writeFile('./students.json', jsonString, err => {
+        if (err) {
+            console.log('Error writing file', err);
+            return false;
+        } else {
+            console.log('Successfully wrote file');
+        }
+    })
+    return true;
 }
 
 const requestHandler = (request, response) => {
@@ -97,72 +116,17 @@ function getHandler(request, response) {
         }
 }
 
-function postHandler(request, response) {
-// //3
-//     if (request.url === "/students") {
-//     var body = "";
-//     request.on("data", function (chunk) {
-//     body += chunk;
-//     });
-
-// req.on("end", function(){
-//     res.writeHead(200, { "Content-Type": "text/html" });
-//     res.end(body);
-// });
-
-
-// //2
-//     if (request.url === "/students") {
-//         var requestBody = '';
-//         request.on('data', function(data) {
-//           requestBody += data;
-//           if(requestBody.length > 1e7) {
-//             response.writeHead(413, 'Request Entity Too Large', {'Content-Type': 'text/html'});
-//             response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
-//           }
-//         });
-//         request.on('end', function() {
-//           var formData = qs.parse(requestBody);
-//           response.writeHead(200, {'Content-Type': 'text/html'});
-//           response.write('<!doctype html><html><head><title>response</title></head><body>');
-//           response.write('Thanks for the data!<br />User Name: '+formData.UserName);
-//           response.write('<br />Repository Name: '+formData.Repository);
-//           response.write('<br />Branch: '+formData.Branch);
-//           response.end('</body></html>');
-//         });
-
-
-// //1
-//     if(request.url === "/students") {
-//         response.setHeader('Content-Type','application/json');
-//         //response.end(JSON.stringify(students));
-//         response.end(getStudents());
-//     }
-//     else if(request.url.split('/')[1] === 'students' && request.url.split('/')[2]) {
-//         const student = getStudents(request.url.split('/')[2]);
-//         if(student) {
-//             response.setHeader('Content-Type','application/json');
-//             response.end(JSON.stringify(student));
-//         }
-//         else {
-//             response.statusCode = 404;
-//             response.end('Student not found! :\'(');
-//         }
-//     }
-//         else {
-//             response.statusCode = 404;
-//             response.end('Not found! :\'(')
-//         }
-}
-
 function deleteHandler(request, response) {
 
     if(request.url.split('/')[1] === 'students' && request.url.split('/')[2]) {
         let student = getStudents(request.url.split('/')[2]);
         if(student) {
-            deleteStudent(request.url.split('/')[2]);
-            response.statusCode = 200;
-            response.end("Student deleted succesfully!");
+            if(deleteStudent(request.url.split('/')[2])){
+                response.statusCode = 200;
+                response.end("Student deleted succesfully!");
+            }
+            else
+            response.end("Student could not be deleted!");
         }
         else {
             response.statusCode = 404;
@@ -172,6 +136,27 @@ function deleteHandler(request, response) {
     else {
             response.statusCode = 404;
             response.end('Not found! :\'(')
+    }
+}
+
+function postHandler(request, response) {
+    if (request.url === "/students") {
+    var qs = require('querystring');
+
+    var body = "";
+    request.on("data", function (chunk) {
+        body += chunk;
+        });
+        request.on("end", function() {
+        var formData = qs.parse(body);
+        var tempJsonObj = {"id": formData.id, "name": formData.name, "points": formData.points};
+        if(addStudent(tempJsonObj)){
+            response.statusCode = 200;            
+            response.end("Student added succesfully!");
+        }
+        else
+            response.end("Student could not be added!");
+        });
     }
 }
 
