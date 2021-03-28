@@ -75,6 +75,31 @@ function addStudent(student) {
     return true;
 }
 
+function updateStudent(student) {
+    let found = false;
+    let students = JSON.parse(fs.readFileSync('./students.json'));
+    for (let i = 0; i < students.length; i++) {
+        if(students[i].id == student.id) {
+            students[i] = student; 
+            found = true;
+        }
+    }
+    if(found){
+        let jsonString = JSON.stringify(students);
+        fs.writeFile('./students.json', jsonString, err => {
+            if (err) {
+                console.log('Error writing file', err);
+                return false;
+            } else {
+                console.log('Successfully wrote file');
+            }
+        })
+        return true;
+    }
+    else
+        return false;
+}
+
 const requestHandler = (request, response) => {
     switch(request.method) {
         case 'GET':
@@ -111,13 +136,12 @@ function getHandler(request, response) {
         }
     }
         else {
-            response.statusCode = 404;
-            response.end('Not found! :\'(')
+            response.statusCode = 405;
+            response.end('Method Not Supported!');
         }
 }
 
 function deleteHandler(request, response) {
-
     if(request.url.split('/')[1] === 'students' && request.url.split('/')[2]) {
         let student = getStudents(request.url.split('/')[2]);
         if(student) {
@@ -134,29 +158,78 @@ function deleteHandler(request, response) {
         }
     }
     else {
-            response.statusCode = 404;
-            response.end('Not found! :\'(')
+        response.statusCode = 405; 
+        response.end('Method Not Supported!');
     }
 }
 
 function postHandler(request, response) {
-    if (request.url === "/students") {
-    var qs = require('querystring');
+    if(request.url.split('/')[1] === 'students' && !request.url.split('/')[2]) {
+        if (request.url === "/students") {
+        var qs = require('querystring');
 
-    var body = "";
-    request.on("data", function (chunk) {
-        body += chunk;
-        });
-        request.on("end", function() {
-        var formData = qs.parse(body);
-        var tempJsonObj = {"id": formData.id, "name": formData.name, "points": formData.points};
-        if(addStudent(tempJsonObj)){
-            response.statusCode = 200;            
-            response.end("Student added succesfully!");
+        var body = "";
+        request.on("data", function (chunk) {
+            body += chunk;
+            if(body.length > 1e7) {
+                response.statusCode = 413;
+                response.end('Request Entity Too Large!');
+            }
+            });
+            request.on("end", function() {
+            var formData = qs.parse(body);
+            var tempJsonObj = {"id": Number(formData.id), "name": formData.name, "points": Number(formData.points)};
+            if(addStudent(tempJsonObj)){
+                response.statusCode = 201;            
+                response.end("Student added succesfully!");
+            }
+            else
+                response.end("Student could not be added!");
+            });
         }
-        else
-            response.end("Student could not be added!");
-        });
+        else {
+            response.statusCode = 404;
+            response.end('Not found! :\'(')
+        }
+    }
+    else {
+        response.statusCode = 405; 
+        response.end('Method Not Supported!');
+    }
+}
+
+function putHandler(request, response) {
+    if(request.url.split('/')[1] === 'students' && !request.url.split('/')[2]) {
+        if (request.url === "/students") {
+        var qs = require('querystring');
+
+        var body = "";
+        request.on("data", function (chunk) {
+            body += chunk;
+            if(body.length > 1e7) {
+                response.statusCode = 413;
+                response.end('Request Entity Too Large!');
+            }
+            });
+            request.on("end", function() {
+            var formData = qs.parse(body);
+            var tempJsonObj = {"id":  Number(formData.id), "name": formData.name, "points": Number(formData.points)};
+            if(updateStudent(tempJsonObj)){
+                response.statusCode = 201;            
+                response.end("Student updated succesfully!");
+            }
+            else
+                response.end("Student could not be updated!");
+            });
+        }
+        else {
+            response.statusCode = 404;
+            response.end('Not found! :\'(')
+        }
+    }
+    else {
+        response.statusCode = 405; 
+        response.end('Method Not Supported!');
     }
 }
 
