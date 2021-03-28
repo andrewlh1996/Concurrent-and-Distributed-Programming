@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "name": "Andrew",
+        "points": 100
+    },
+    {
+        "id": 2,
+        "name": "Andy",
+        "points": 200
+    },
+    {
+        "id": 3,
+        "name": "Bubu",
+        "points": 300
+    },
+    {
+        "id": 4,
+        "name": "Cody",
+        "points": 400
+    },
+    {
+        "id": 5,
+        "name": "CodyTest",
+        "points": 500
+    }
+]
