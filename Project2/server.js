@@ -215,7 +215,7 @@ function putHandler(request, response) {
             var formData = qs.parse(body);
             var tempJsonObj = {"id":  Number(formData.id), "name": formData.name, "points": Number(formData.points)};
             if(updateStudent(tempJsonObj)){
-                response.statusCode = 201;            
+                response.statusCode = 200;            
                 response.end("Student updated succesfully!");
             }
             else
