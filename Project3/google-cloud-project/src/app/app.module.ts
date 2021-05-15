@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AgmCoreModule } from '@agm/core';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatDividerModule,
     MatButtonModule,
     MatSelectModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyD9EyBKBy4ZrXI42wOcVY6siGca-_O9EmU',
+      libraries: ['places']
+    }),
+    AgmCoreModule,
   ],
   providers: [GoogleService],
   bootstrap: [AppComponent]
