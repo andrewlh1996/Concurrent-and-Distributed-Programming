@@ -24,6 +24,10 @@ export class AppComponent implements OnInit {
   @ViewChild('search')
   public searchElementRef: ElementRef;
 
+  //Youtube
+  @ViewChild('channelName') channelName: ElementRef;
+  channels: any;
+
   constructor(private _google: GoogleService,
     private mapsAPILoader: MapsAPILoader,
     private ngZone: NgZone) { }
@@ -80,6 +84,13 @@ export class AppComponent implements OnInit {
         window.alert('Geocoder failed due to: ' + status);
       }
 
+    });
+  }
+
+  getChannels(channel:string) {
+    this._google.getChannels(channel).subscribe(x => {
+      console.log(x);
+      this.channels = x.items;
     });
   }
 

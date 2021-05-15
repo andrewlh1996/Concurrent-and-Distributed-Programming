@@ -63,3 +63,23 @@
   <div>Longitude: {{longitude}}</div>
 
 </div>
+
+<br>
+<br>
+<div class="container">
+
+  <h1>Youtube channel search</h1>
+  <label for="channelName">Channel Name:</label>
+  <input type="text" placeholder="Youtube Channel..." required id="channelName" #channelName>
+  <br><br>
+  <button class="btn btn-primary" (click)="getChannels(channelName.value)">Get channels</button>
+
+  <ul *ngFor="let channel of channels">
+    <a target="_blank" href="https://www.youtube.com/channel/{{channel.id.channelId}}">
+      <img class="img-thumbnail" width="200" height="200" src="{{channel.snippet.thumbnails.medium.url}}"/>
+    </a>
+    {{channel.snippet.channelTitle}}
+  </ul>
+
+
+</div>
