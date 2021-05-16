@@ -1,6 +1,6 @@
 import { MapsAPILoader } from '@agm/core';
 import { Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
-import { GoogleObj, GoogleService } from './google.services';
+import { GoogleObj, GoogleService, User } from './google.services';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +28,11 @@ export class AppComponent implements OnInit {
   @ViewChild('channelName') channelName: ElementRef;
   channels: any;
 
+  //Firestore
+  @ViewChild('name') name: ElementRef;
+  @ViewChild('age') age: ElementRef;
+  users: User[];
+
   constructor(private _google: GoogleService,
     private mapsAPILoader: MapsAPILoader,
     private ngZone: NgZone) { }
@@ -42,6 +47,18 @@ export class AppComponent implements OnInit {
     this.mapsAPILoader.load().then(() => {
       this.setCurrentLocation();
       this.geoCoder = new google.maps.Geocoder;
+    });
+
+    //Firestore
+    this._google.getUsers().subscribe(data => {
+      this.users = data.map( e => {
+        return {
+          id: e.payload.doc.id,
+          ...e.payload.doc.data() as any
+        } as User;
+      })
+      console.log(this.users);
+
     });
   }
 
@@ -92,6 +109,20 @@ export class AppComponent implements OnInit {
       console.log(x);
       this.channels = x.items;
     });
+  }
+
+  delete(userId) {
+    this._google.deleteUser(userId);
+  }
+
+  update(user:User) {
+    user.age = +user.age;
+    this._google.updateUser(user);
+  }
+
+  add() {
+    var user = {name: this.name.nativeElement.value, age: +this.age.nativeElement.value} as User;
+    this._google.createUser(user);
   }
 
 }

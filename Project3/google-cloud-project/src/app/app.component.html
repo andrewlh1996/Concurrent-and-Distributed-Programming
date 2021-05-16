@@ -83,3 +83,50 @@
 
 
 </div>
+
+<br>
+<br>
+<div class="container">
+
+  <h1>FireStore</h1>
+  <table>
+    <thead>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Age</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>
+          <input [(ngModel)]="user.id" />
+        </td>
+        <td>
+          <input [(ngModel)]="user.name" />
+        </td>
+        <td>
+          <input [(ngModel)]="user.age" />
+        </td>
+        <td>
+            <button (click)="delete(user.id)">Delete</button>
+        </td>
+        <td>
+          <button (click)="update(user)">Update</button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input [disabled]="true"/>
+        </td>
+        <td>
+          <input #name/>
+        </td>
+        <td>
+          <input #age/>
+        </td>
+        <td>
+            <button (click)="add()">Add</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
